@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    background-color: #3c3836;
+}
+
+#canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    border-style: solid;
+    border-width: 10px;
+    border-color: #7c6f64;
+    border-radius: 10px;
+}
+
+button {
+    height: 50px;
+    width: 50px;
+
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+    left: 50px;
+    right: 0;
+}
+
