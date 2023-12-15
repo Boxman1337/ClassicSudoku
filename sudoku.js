@@ -13,17 +13,44 @@ class Sudoku {
         }, () => Array.from({
             length: sideSize
         }, () => 0));
+
+    }
+
+    checkIfMatrixIsCorrect() {
+        
+        let currentMatrix = this.matrix;
+        let correctMatrix = this.correctMatrix;
+
+        if (!currentMatrix || !correctMatrix) {
+            return false;
+        }
+        
+        if ((currentMatrix.length != correctMatrix.length) || (currentMatrix[0].length != correctMatrix[0].length)) {
+            return false;
+        } 
+
+        for (let i = 0; i < currentMatrix.length; i++) {
+            for (let j = 0; j < currentMatrix[0].length; j++) {
+                if (currentMatrix[i][j] != correctMatrix[i][j]) {
+                    return false; 
+                }
+            }
+        }
+        
+        return true;
+
     }
 
     generateGrid() {
-
-        let sqrtSideSize = this.sqrtSideSize;
 
         // Fill the 3 diagonal boxes
         this.fillDiagonalBoxes();
         
         // Fill the remaining boxes
         this.fillRemaining(0, 0);
+
+        // Clones the matrix by-value into the variable holding the correct matrix
+        this.correctMatrix = JSON.parse(JSON.stringify(this.matrix));
 
         // Remove digits from the grid according to difficulty
         this.removeDigits();
@@ -38,11 +65,14 @@ class Sudoku {
         for (let i = 0; i < sqrtSideSize; i++) {
             for (let j = 0; j < sqrtSideSize; j++) {
                 while (true) {
+
                     number = this.generateNumber(sideSize);
+                    
                     if (this.validInBox(row, column, number)) {
                         break;
                     }
                 }
+
                 this.matrix[row + i][column + j] = number;
             }
         }
@@ -164,8 +194,6 @@ class Sudoku {
                 this.matrix[row][column] = 0;
             }
         }
-
-        return null;
     }    
 
     generateNumber(maxNumber) {
@@ -173,7 +201,10 @@ class Sudoku {
     }
 
     printSudoku() {
+        console.log("Current matrix: ");
         console.log(this.matrix);
+        console.log("Correct matrix: ");
+        console.log(this.correctMatrix);
     }
 
 }
