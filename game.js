@@ -5,24 +5,22 @@ class Game {
     
     constructor(sideSize, difficulty) {
 
+        this.sideSize = sideSize;
+        this.difficulty = difficulty;
+
         this.fps = 30;
 
         this.sudoku = new Sudoku(sideSize, difficulty);
         this.canvas = new Canvas();
-
+        
     }
 
     setup() {
         this.sudoku.generateGrid();
     }
 
-    updateGameState() {
-        this.update();
-        this.draw();
-    }
-
     update() {
-        return null;
+        
     }
 
     draw() {
@@ -39,23 +37,55 @@ class Game {
     }
 
     gameLoop() {
-        setTimeout(() => {
-            this.updateGameState();
-            this.gameLoop();
-        }), 1000 / this.fps;
+        this.update();
+        this.draw();
+
+        let isSolved = this.sudoku.checkIfMatrixIsCorrect();
+
+        if (isSolved) {
+            alert("You win!");
+            clearInterval(intervalID);
+        }
+
     }
 
 }
 
-const printbutton = document.getElementById("printbutton");
+window.addEventListener("keydown", function onEvent(event) {
 
-printbutton.addEventListener("click", () => {
-    console.log(game.sudoku.printSudoku());
+    let currentCell = game.canvas.selectedCell;
+    let size = game.sideSize;
+
+    let xPos = currentCell.x;
+    let yPos = currentCell.y;
+
+    let keyPressed = event.key;
+    
+    let reg = /^\d+$/;
+    let passesReg = reg.test(keyPressed);
+
+    if (keyPressed === "ArrowLeft") {
+        if (xPos <= 0) return;
+        game.canvas.selectedCell = {x: (xPos - 1), y: yPos};
+    } else if (keyPressed === "ArrowRight") {
+        if (xPos >= size - 1) return;
+        game.canvas.selectedCell = {x: (xPos + 1), y: yPos};
+    } else if (keyPressed === "ArrowUp") {
+        if (yPos <= 0) return;
+        game.canvas.selectedCell = {x: xPos, y: (yPos - 1)};
+    } else if (keyPressed === "ArrowDown") {
+        if (yPos >= size - 1) return;
+        game.canvas.selectedCell = {x: xPos, y: (yPos + 1)};
+    } else if (passesReg) {
+        game.sudoku.matrix[yPos][xPos] = keyPressed;
+    } 
+
 });
 
-
-
-const game = new Game(9, 50);
+const game = new Game(9, 10);
 game.setup();
-game.gameLoop();
+
+const intervalID = setInterval(() => {
+    game.gameLoop();
+}, 1000 / game.fps);
 
