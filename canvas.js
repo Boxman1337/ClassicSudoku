@@ -5,14 +5,13 @@ class Canvas {
         this.canvas = document.getElementById("canvas");
         this.canvasContext = this.canvas.getContext("2d");
 
-        this.selectedCell = {x: 0, y: 0};
-        //this.selectedCell = {x: 0, y: 0};
+        this.selectedCell = {x: 4, y: 4};
 
-        this.cellColor = "#a89984";
-        this.borderColor = "#7c6f64";
-        this.borderColorDark = "#665c54";
-        this.textColor = "#ebdbb2";
-        this.selectedCellColor = "rgba(181, 118, 20, 0.4)";
+        this.cellColor              = "#a89984";
+        this.borderColor            = "#7c6f64";
+        this.borderColorDark        = "#665c54";
+        this.textColor              = "#ebdbb2";
+        this.selectedCellColor      = "rgba(181, 118, 20, 0.4)";
 
         this.sideSize = this.canvas.width / 9;
         this.wallWidth = this.sideSize / 50;
@@ -132,9 +131,6 @@ class Canvas {
 
     drawGrid(matrix) {
 
-        let sideSize = this.sideSize;
-        let wallWidth = this.wallWidth;
-
         // Draw cells and cell walls for each cell
         this.drawCells(matrix);
 
@@ -143,7 +139,6 @@ class Canvas {
 
         // Draw cell number for each cell
         this.drawCellNumber(matrix);
-
         
     }
 }

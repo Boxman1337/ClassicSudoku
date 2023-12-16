@@ -1,18 +1,30 @@
 import { Sudoku } from './sudoku.js';
 import { Canvas } from './canvas.js';
 
-class Game {
-    
-    constructor(sideSize, difficulty) {
+const canvas = new Canvas();
 
-        this.sideSize = sideSize;
+let canvasWidth = canvas.width;
+let canvasHeight = canvas.height;
+
+class GameInstance {
+
+    constructor(difficulty) {
+
+        // Set grid-size
+        this.cellsPerSide = 9;
+        
+        // Set difficulty
         this.difficulty = difficulty;
 
-        this.fps = 30;
+        // Set fps
+        this.fps = 60;
 
-        this.sudoku = new Sudoku(sideSize, difficulty);
-        this.canvas = new Canvas();
-        
+        // Sets a variable containing the intervalID
+        this.gameLoopIntervalID = null;
+
+        // Initializes a new sudoku-game
+        this.sudoku = new Sudoku(this.cellsPerSide, difficulty);
+
     }
 
     setup() {
@@ -20,41 +32,62 @@ class Game {
     }
 
     update() {
-        
+
     }
 
     draw() {
 
         let matrix = this.sudoku.matrix;
 
-        let canvasWidth = this.canvas.width;
-        let canvasHeight = this.canvas.height;
+        canvas.canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.drawRect(0, 0, canvasWidth, canvasHeight, "black");
+        canvas.drawGrid(matrix);
+        canvas.drawBoxEmphasis();
 
-        this.canvas.canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-        this.canvas.drawRect(0, 0, canvasWidth, canvasHeight, "black");
-        this.canvas.drawGrid(matrix);
-        this.canvas.drawBoxEmphasis();
     }
 
     gameLoop() {
+
         this.update();
         this.draw();
 
         let isSolved = this.sudoku.checkIfMatrixIsCorrect();
 
         if (isSolved) {
-            alert("You win!");
-            clearInterval(intervalID);
+            console.log("You win!");
+            clearInterval(this.gameLoopIntervalID);
         }
+    }
 
+}
+
+
+class Game {
+
+    constructor(gameInstance) {
+
+        if (!gameInstance) return;
+
+        this.newGameInstance(gameInstance);
+    }
+
+    newGameInstance(gameInstance) {
+
+        this.gameInstance = gameInstance;
+
+        this.gameInstance.setup();
+
+        this.gameInstance.gameLoopIntervalID = setInterval(() => {
+            this.gameInstance.gameLoop();
+        }, 1000 / gameInstance.fps);
     }
 
 }
 
 window.addEventListener("keydown", function onEvent(event) {
 
-    let currentCell = game.canvas.selectedCell;
-    let size = game.sideSize;
+    let currentCell = canvas.selectedCell;
+    let cellsPerSide = game.gameInstance.cellsPerSide;
 
     let xPos = currentCell.x;
     let yPos = currentCell.y;
@@ -65,27 +98,48 @@ window.addEventListener("keydown", function onEvent(event) {
     let passesReg = reg.test(keyPressed);
 
     if (keyPressed === "ArrowLeft") {
+        
         if (xPos <= 0) return;
-        game.canvas.selectedCell = {x: (xPos - 1), y: yPos};
+        canvas.selectedCell = {x: (xPos - 1), y: yPos};
+    
     } else if (keyPressed === "ArrowRight") {
-        if (xPos >= size - 1) return;
-        game.canvas.selectedCell = {x: (xPos + 1), y: yPos};
+        
+        if (xPos >= cellsPerSide - 1) return;
+        canvas.selectedCell = {x: (xPos + 1), y: yPos};
+    
     } else if (keyPressed === "ArrowUp") {
+        
         if (yPos <= 0) return;
-        game.canvas.selectedCell = {x: xPos, y: (yPos - 1)};
+        canvas.selectedCell = {x: xPos, y: (yPos - 1)};
+   
     } else if (keyPressed === "ArrowDown") {
-        if (yPos >= size - 1) return;
-        game.canvas.selectedCell = {x: xPos, y: (yPos + 1)};
+        
+        if (yPos >= cellsPerSide - 1) return;
+        canvas.selectedCell = {x: xPos, y: (yPos + 1)};
+    
     } else if (passesReg) {
-        game.sudoku.matrix[yPos][xPos] = keyPressed;
+        
+        game.gameInstance.sudoku.matrix[yPos][xPos] = keyPressed;
+
     } 
 
 });
 
-const game = new Game(9, 10);
-game.setup();
+const newGameButton = document.getElementById("newGameButton");
+const difficultySelector = document.getElementById("selectDifficulty");
+newGameButton.addEventListener("click", () => {
 
-const intervalID = setInterval(() => {
-    game.gameLoop();
-}, 1000 / game.fps);
+    clearInterval(game.gameInstance.gameLoopIntervalID);
+
+    let difficulty = difficultySelector.value;
+
+    game.newGameInstance(new GameInstance(difficulty));
+
+});
+
+const game = new Game(new GameInstance(55));
+
+
+
+
 
